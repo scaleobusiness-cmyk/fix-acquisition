@@ -799,13 +799,33 @@ legend{padding:0;margin-bottom:.65rem;font-size:.9375rem;font-weight:600;line-he
     if(!FORM_ENDPOINT){ done(true); return; }
 
     btn.disabled = true;
-    fetch(FORM_ENDPOINT, {method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body: JSON.stringify(data)})
-      .then(function(r){ if(!r.ok) throw new Error('bad status'); done(false); })
-      .catch(function(){
-        btn.disabled = false;
-        showFormError('تعذر إرسال النموذج. تحقق من الاتصال وحاول مرة أخرى.', "We couldn't send the form. Check your connection and try again.");
-      });
-  });
+
+fetch(FORM_ENDPOINT, {
+  method:'POST',
+  headers:{
+    'Content-Type':'application/json',
+    'Accept':'application/json'
+  },
+  body: JSON.stringify(data)
+})
+.then(function(r){
+  if(!r.ok) throw new Error('bad status');
+
+  // Send successful form submission to Meta Pixel
+  if(typeof fbq === 'function'){
+    fbq('track', 'Lead');
+  }
+
+  done(false);
+})
+.catch(function(){
+  btn.disabled = false;
+
+  showFormError(
+    'تعذر إرسال النموذج. تحقق من الاتصال وحاول مرة أخرى.',
+    "We couldn't send the form. Check your connection and try again."
+  );
+});
 })();
 </script>
 </body>
