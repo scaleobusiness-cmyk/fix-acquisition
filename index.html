@@ -532,7 +532,6 @@ legend{padding:0;margin-bottom:.65rem;font-size:.9375rem;font-weight:600;line-he
       <p class="fineprint"><span class="ar">تختلف النتائج بحسب كل Business ونتيجة التشخيص، ولا نعد بأرقام محددة.</span><span class="en">Results depend on each business and its diagnosis. We don't promise specific figures.</span></p>
     </div>
   </section>
-  </section>
 
   <!-- FINAL CTA -->
   <section class="cta">
@@ -679,8 +678,8 @@ legend{padding:0;margin-bottom:.65rem;font-size:.9375rem;font-weight:600;line-he
 <script>
 (function(){
   "use strict";
-  /* Paste your form endpoint here (Formspree, Make, Zapier, n8n webhook...).
-     While it is empty the form validates and shows a preview-mode confirmation, nothing is sent. */
+  
+  /* Paste your form endpoint here (Formspree, Make, Zapier, n8n webhook...). */
   var FORM_ENDPOINT = "https://formspree.io/f/xljdkobq";
 
   var root = document.documentElement;
@@ -690,22 +689,46 @@ legend{padding:0;margin-bottom:.65rem;font-size:.9375rem;font-weight:600;line-he
 
   /* ---------- language ---------- */
   function setLang(l){
-    root.lang = l; root.dir = l === 'ar' ? 'rtl' : 'ltr'; root.setAttribute('data-lang', l);
-    $$('[data-set-lang]').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-set-lang') === l ? 'true' : 'false'); });
-    $$('option[data-ar]').forEach(function(o){ o.textContent = o.getAttribute('data-' + l); });
+    root.lang = l; 
+    root.dir = l === 'ar' ? 'rtl' : 'ltr'; 
+    root.setAttribute('data-lang', l);
+    
+    $$('[data-set-lang]').forEach(function(b){ 
+      b.setAttribute('aria-pressed', b.getAttribute('data-set-lang') === l ? 'true' : 'false'); 
+    });
+    
+    $$('option[data-ar]').forEach(function(o){ 
+      o.textContent = o.getAttribute('data-' + l); 
+    });
+    
     try{ localStorage.setItem('scaleo-lang', l); }catch(e){}
   }
-  $$('[data-set-lang]').forEach(function(b){ b.addEventListener('click', function(){ setLang(b.getAttribute('data-set-lang')); }); });
+  
+  $$('[data-set-lang]').forEach(function(b){ 
+    b.addEventListener('click', function(){ 
+      setLang(b.getAttribute('data-set-lang')); 
+    }); 
+  });
+  
   setLang(root.lang === 'en' ? 'en' : 'ar');
 
   /* ---------- CTA smooth scroll ---------- */
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  
   $$('[data-cta]').forEach(function(a){
     a.addEventListener('click', function(e){
       e.preventDefault();
       var t = document.getElementById('diagnosis');
-      t.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'start'});
-      setTimeout(function(){ var f = document.getElementById('f-name'); if(f){ try{ f.focus({preventScroll:true}); }catch(err){ f.focus(); } } }, reduce ? 0 : 700);
+      if(t) {
+        t.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'start'});
+        setTimeout(function(){ 
+          var f = document.getElementById('f-name'); 
+          if(f){ 
+            try{ f.focus({preventScroll:true}); }
+            catch(err){ f.focus(); } 
+          } 
+        }, reduce ? 0 : 700);
+      }
     });
   });
 
@@ -713,12 +736,19 @@ legend{padding:0;margin-bottom:.65rem;font-size:.9375rem;font-weight:600;line-he
   var rv = $$('.rv');
   if('IntersectionObserver' in window){
     var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+      entries.forEach(function(en){ 
+        if(en.isIntersecting){ 
+          en.target.classList.add('in'); 
+          io.unobserve(en.target); 
+        } 
+      });
     }, {threshold:.12, rootMargin:'0px 0px -6% 0px'});
     rv.forEach(function(el){ io.observe(el); });
-  } else { rv.forEach(function(el){ el.classList.add('in'); }); }
+  } else { 
+    rv.forEach(function(el){ el.classList.add('in'); }); 
+  }
 
-  /* ---------- form validation ---------- */
+  /* ---------- form validation logic ---------- */
   var MSG = {
     required:{ar:'هذا الحقل مطلوب.', en:'This field is required.'},
     email:{ar:'أدخل بريدًا إلكترونيًا صحيحًا.', en:'Enter a valid email address.'},
@@ -726,106 +756,182 @@ legend{padding:0;margin-bottom:.65rem;font-size:.9375rem;font-weight:600;line-he
     website:{ar:'أدخل عنوان موقع صحيحًا، مثل example.com.', en:'Enter a valid website, for example example.com.'},
     choose:{ar:'يرجى اختيار أحد الخيارات.', en:'Please choose one option.'}
   };
+
   function showErr(id, key){
     var el = document.getElementById('e-' + id);
     if(!el) return;
-    if(key){ el.innerHTML = '<span class="ar">' + MSG[key].ar + '</span><span class="en">' + MSG[key].en + '</span>'; el.hidden = false; }
-    else { el.innerHTML = ''; el.hidden = true; }
+    if(key){ 
+      el.innerHTML = '<span class="ar">' + MSG[key].ar + '</span><span class="en">' + MSG[key].en + '</span>'; 
+      el.hidden = false; 
+    }
+    else { 
+      el.innerHTML = ''; 
+      el.hidden = true; 
+    }
   }
-  function mark(input, bad){ if(bad){ input.setAttribute('aria-invalid','true'); input.setAttribute('aria-describedby','e-' + input.name); } else { input.removeAttribute('aria-invalid'); input.removeAttribute('aria-describedby'); } }
+
+  function mark(input, bad){ 
+    if(bad){ 
+      input.setAttribute('aria-invalid','true'); 
+      input.setAttribute('aria-describedby','e-' + input.name); 
+    } else { 
+      input.removeAttribute('aria-invalid'); 
+      input.removeAttribute('aria-describedby'); 
+    } 
+  }
 
   var rules = {
     name: function(v){ return v.trim().length < 2 ? 'required' : ''; },
     business: function(v){ return v.trim().length < 2 ? 'required' : ''; },
-    website: function(v){ v = v.trim(); if(!v) return ''; return /^(https?:\/\/)?([a-z0-9-]+\.)+[a-z]{2,}(\/\S*)?$/i.test(v) ? '' : 'website'; },
-    email: function(v){ v = v.trim(); if(!v) return 'required'; return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? '' : 'email'; },
-    phone: function(v){ v = v.trim(); if(!v) return 'required'; var d = v.replace(/\D/g,''); return (/^[+()\d\s.\-]+$/.test(v) && d.length >= 7 && d.length <= 15) ? '' : 'phone'; },
+    website: function(v){ 
+      v = v.trim(); 
+      if(!v) return ''; 
+      return /^(https?:\/\/)?([a-z0-9-]+\.)+[a-z]{2,}(\/\S*)?$/i.test(v) ? '' : 'website'; 
+    },
+    email: function(v){ 
+      v = v.trim(); 
+      if(!v) return 'required'; 
+      return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? '' : 'email'; 
+    },
+    phone: function(v){ 
+      v = v.trim(); 
+      if(!v) return 'required'; 
+      var d = v.replace(/\D/g,''); 
+      return (/^[+()\d\s.\-]+$/.test(v) && d.length >= 7 && d.length <= 15) ? '' : 'phone'; 
+    },
     country: function(v){ return v ? '' : 'required'; }
   };
+
   function checkField(name){
     var input = form.elements[name];
+    if(!input) return true; // Skip if element missing
     var key = rules[name](input.value);
-    mark(input, !!key); showErr(name, key);
+    mark(input, !!key); 
+    showErr(name, key);
     return !key;
   }
+
   function checkGroup(name){
-    var ok = !!form.querySelector('input[name="' + name + '"]:checked');
+    var checked = form.querySelector('input[name="' + name + '"]:checked');
+    var ok = !!checked;
     showErr(name, ok ? '' : 'choose');
     $$('input[name="' + name + '"]', form).forEach(function(r){ mark(r, !ok); });
     return ok;
   }
+
   var tried = false;
+  
+  // Attach listeners to individual fields
   Object.keys(rules).forEach(function(n){
     var el = form.elements[n];
+    if(!el) return;
     el.addEventListener('blur', function(){ if(tried || el.value) checkField(n); });
     el.addEventListener('input', function(){ if(tried || el.getAttribute('aria-invalid')) checkField(n); });
     el.addEventListener('change', function(){ if(tried) checkField(n); });
   });
-  ['situation','spend'].forEach(function(n){
-    $$('input[name="' + n + '"]', form).forEach(function(r){ r.addEventListener('change', function(){ checkGroup(n); }); });
+
+  // Attach listeners to radio groups
+  ['situation'].forEach(function(n){
+    $$('input[name="' + n + '"]', form).forEach(function(r){ 
+      r.addEventListener('change', function(){ checkGroup(n); }); 
+    });
   });
 
   function showFormError(ar, en){
     var el = document.getElementById('formerr');
-    el.innerHTML = '<span class="ar">' + ar + '</span><span class="en">' + en + '</span>';
-    el.hidden = false;
+    if(el) {
+      el.innerHTML = '<span class="ar">' + ar + '</span><span class="en">' + en + '</span>';
+      el.hidden = false;
+    }
   }
 
+  // --- MAIN SUBMIT HANDLER ---
   form.addEventListener('submit', function(e){
-    e.preventDefault();
+    e.preventDefault(); // This stops the refresh
     tried = true;
-    document.getElementById('formerr').hidden = true;
+    
+    var errEl = document.getElementById('formerr');
+    if(errEl) errEl.hidden = true;
+    
     var firstBad = null;
-    ['name','business','website','email','phone','country'].forEach(function(n){ if(!checkField(n) && !firstBad) firstBad = form.elements[n]; });
-    ['situation'].forEach(function(n){ if(!checkGroup(n) && !firstBad) firstBad = form.querySelector('input[name="' + n + '"]'); });
-    if(firstBad){ firstBad.focus(); return; }
+    
+    // Validate standard fields
+    ['name','business','website','email','phone','country'].forEach(function(n){ 
+      if(!checkField(n) && !firstBad) firstBad = form.elements[n]; 
+    });
+    
+    // Validate radio groups
+    ['situation'].forEach(function(n){ 
+      if(!checkGroup(n) && !firstBad) firstBad = form.querySelector('input[name="' + n + '"]'); 
+    });
+    
+    if(firstBad){ 
+      firstBad.focus(); 
+      return; 
+    }
 
     var btn = document.getElementById('submitBtn');
+    if(btn) btn.disabled = true;
+
     var data = {
-      name: form.elements.name.value.trim(), business: form.elements.business.value.trim(),
-      website: form.elements.website.value.trim(), email: form.elements.email.value.trim(),
-      phone: form.elements.phone.value.trim(), country: form.elements.country.value,
+      name: form.elements.name.value.trim(), 
+      business: form.elements.business.value.trim(),
+      website: form.elements.website.value.trim(), 
+      email: form.elements.email.value.trim(),
+      phone: form.elements.phone.value.trim(), 
+      country: form.elements.country.value,
       situation: form.querySelector('input[name="situation"]:checked').value,
-      notes: form.elements.notes.value.trim(), language: root.lang, page: 'fix-your-acquisition'
+      notes: form.elements.notes.value.trim(), 
+      language: root.lang, 
+      page: 'fix-your-acquisition'
     };
 
     function done(preview){
       form.hidden = true;
-      var s = document.getElementById('success'); s.hidden = false;
-      document.getElementById('devnote').hidden = !preview;
-      document.getElementById('formcard').scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'center'});
+      var s = document.getElementById('success'); 
+      if(s) s.hidden = false;
+      
+      // Hide dev note if exists
+      var dn = document.getElementById('devnote');
+      if(dn) dn.hidden = !preview;
+      
+      var fc = document.getElementById('formcard');
+      if(fc) fc.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'center'});
     }
 
-    if(!FORM_ENDPOINT){ done(true); return; }
+    if(!FORM_ENDPOINT){ 
+      done(true); 
+      return; 
+    }
 
-    btn.disabled = true;
+    fetch(FORM_ENDPOINT, {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Accept':'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    .then(function(r){
+      if(!r.ok) throw new Error('bad status');
 
-fetch(FORM_ENDPOINT, {
-  method:'POST',
-  headers:{
-    'Content-Type':'application/json',
-    'Accept':'application/json'
-  },
-  body: JSON.stringify(data)
-})
-.then(function(r){
-  if(!r.ok) throw new Error('bad status');
+      // Send successful form submission to Meta Pixel
+      if(typeof fbq === 'function'){
+        fbq('track', 'Lead');
+      }
 
-  // Send successful form submission to Meta Pixel
-  if(typeof fbq === 'function'){
-    fbq('track', 'Lead');
-  }
+      done(false);
+    })
+    .catch(function(error){
+      console.error("Submission error:", error);
+      if(btn) btn.disabled = false;
 
-  done(false);
-})
-.catch(function(){
-  btn.disabled = false;
-
-  showFormError(
-    'تعذر إرسال النموذج. تحقق من الاتصال وحاول مرة أخرى.',
-    "We couldn't send the form. Check your connection and try again."
-  );
-});
+      showFormError(
+        'تعذر إرسال النموذج. تحقق من الاتصال وحاول مرة أخرى.',
+        "We couldn't send the form. Check your connection and try again."
+      );
+    });
+  });
 })();
 </script>
 </body>
